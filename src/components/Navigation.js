@@ -1,5 +1,5 @@
 
-import { NavLink } from 'react-router-dom';
+import { NavLink } from 'react-router-dom'
 
 function Navigation() {
   return (
@@ -8,6 +8,11 @@ function Navigation() {
       <NavLink to="/" className="nav-item">
         <span>⌂</span>
         <p>Главная</p>
+      </NavLink>
+
+      <NavLink to="/calendar" className="nav-item">
+        <span>📅</span>
+        <p>Календарь</p>
       </NavLink>
 
       <NavLink to="/workouts" className="nav-item">
@@ -20,18 +25,13 @@ function Navigation() {
         <p>Упражнения</p>
       </NavLink>
 
-      <NavLink to="/calendar" className="nav-item">
-        <span>📅</span>
-        <p>Календарь</p>
-      </NavLink>
-
       <NavLink to="/profile" className="nav-item">
         <span>👤</span>
         <p>Профиль</p>
       </NavLink>
 
     </nav>
-  );
+  )
 }
 
-export default Navigation;
+export default Navigation

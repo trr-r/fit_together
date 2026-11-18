@@ -1,6 +1,6 @@
 import "./App.css"
 import { useState, useEffect } from "react"
-import { BrowserRouter, Routes, Route } from "react-router-dom"
+import { HashRouter, Routes, Route } from "react-router-dom"
 
 import Home from "./pages/Home"
 import Workouts from "./pages/Workouts"
@@ -28,6 +28,10 @@ function App() {
     return JSON.parse(localStorage.getItem("plannedWorkouts")) || []
   })
 
+  const [trainingBlocks, setTrainingBlocks] = useState(() => {
+    return JSON.parse(localStorage.getItem("trainingBlocks")) || []
+  })
+
   const [planHistory, setPlanHistory] = useState(() => {
     return JSON.parse(localStorage.getItem("planHistory")) || []
   })
@@ -49,14 +53,28 @@ function App() {
   }, [plannedWorkouts])
 
   useEffect(() => {
+    localStorage.setItem("trainingBlocks", JSON.stringify(trainingBlocks))
+  }, [trainingBlocks])
+
+  useEffect(() => {
     localStorage.setItem("planHistory", JSON.stringify(planHistory))
   }, [planHistory])
 
   return (
-    <BrowserRouter>
-      <div className="app">
-        <Routes>
-          <Route path="/" element={<Home />} />
+    <HashRouter>
+     <div className="app">
+  <Routes>
+    <Route
+      path="/"
+      element={
+        <Home
+          trainingBlocks={trainingBlocks}
+          plannedWorkouts={plannedWorkouts}
+          history={history}
+          exercises={exercises}
+        />
+      }
+    />
 
           <Route
             path="/workouts"
@@ -92,6 +110,8 @@ function App() {
                 exercises={exercises}
                 planHistory={planHistory}
                 setPlanHistory={setPlanHistory}
+                trainingBlocks={trainingBlocks}
+                setTrainingBlocks={setTrainingBlocks}
               />
             }
           />
@@ -108,7 +128,7 @@ function App() {
 
         <Navigation />
       </div>
-    </BrowserRouter>
+    </HashRouter>
   )
 }
 
