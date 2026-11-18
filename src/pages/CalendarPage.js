@@ -36,7 +36,7 @@ function CalendarPage({
   const [showBlockForm, setShowBlockForm] = useState(false)
 
   const [calendarDays, setCalendarDays] = useState({})
-  const [calendarError, setCalendarError] = useState("")
+  const [calendarError] = useState(...)
 
   function formatDateKey(date) {
     const year = date.getFullYear()
@@ -234,7 +234,7 @@ function CalendarPage({
     if (hasChanges) {
       setPlannedWorkouts(updatedWorkouts)
     }
-  }, [plannedWorkouts, trainingBlocks])
+  }, [plannedWorkouts, trainingBlocks, setPlannedWorkouts, setTrainingBlocks])
 
   function addTrainingBlock() {
     const activeBlock = trainingBlocks.find(
