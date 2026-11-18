@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/fit_together/static/css/main.942060d5.css",
+    "main.js": "/fit_together/static/js/main.7f178721.js",
+    "static/js/453.65d6552c.chunk.js": "/fit_together/static/js/453.65d6552c.chunk.js",
+    "index.html": "/fit_together/index.html",
+    "main.942060d5.css.map": "/fit_together/static/css/main.942060d5.css.map",
+    "main.7f178721.js.map": "/fit_together/static/js/main.7f178721.js.map",
+    "453.65d6552c.chunk.js.map": "/fit_together/static/js/453.65d6552c.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.942060d5.css",
+    "static/js/main.7f178721.js"
+  ]
+}
