@@ -36,7 +36,6 @@ function CalendarPage({
   const [showBlockForm, setShowBlockForm] = useState(false)
 
   const [calendarDays, setCalendarDays] = useState({})
-  const [calendarError] = useState(...)
 
   function formatDateKey(date) {
     const year = date.getFullYear()
