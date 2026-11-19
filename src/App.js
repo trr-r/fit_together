@@ -112,7 +112,7 @@ function UserApp({ user, theme, setTheme, onLogout }) {
     loadUserData(user.id, "workouts")
   )
 
-  const [exercises, setExercises] = useState(() =>
+  const [exercises] = useState(() =>
     loadUserData(user.id, "exercises")
   )
 
