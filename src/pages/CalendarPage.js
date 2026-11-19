@@ -191,50 +191,73 @@ function CalendarPage({
   )
 
   useEffect(() => {
-    if (plannedWorkouts.length === 0) return
-  
     const updatedWorkouts = [...plannedWorkouts]
     let hasChanges = false
-  
+
     trainingBlocks.forEach((block) => {
-      const blockWorkouts = updatedWorkouts
+      const completedWorkouts = history.filter(
+        (workout) => workout.blockId === block.id
+      )
+
+      const plannedBlockWorkouts = updatedWorkouts
         .filter((workout) => workout.blockId === block.id)
         .sort((a, b) => {
           const dateComparison = a.date.localeCompare(b.date)
-  
+
           if (dateComparison !== 0) return dateComparison
-  
+
           return (a.time || "").localeCompare(b.time || "")
         })
-  
-      blockWorkouts.forEach((workout, index) => {
+
+      const allBlockWorkouts = [
+        ...completedWorkouts,
+        ...plannedBlockWorkouts,
+      ].sort((a, b) => {
+        const dateComparison = a.date.localeCompare(b.date)
+
+        if (dateComparison !== 0) return dateComparison
+
+        return (a.time || "").localeCompare(b.time || "")
+      })
+
+      allBlockWorkouts.forEach((workout, index) => {
+        const plannedWorkout = updatedWorkouts.find(
+          (item) => item.id === workout.id
+        )
+
+        if (!plannedWorkout) return
+
         const correctNumber = index + 1
-  
-        if (workout.workoutNumber !== correctNumber) {
-          const item = updatedWorkouts.find(
-            (entry) => entry.id === workout.id
-          )
-  
-          item.workoutNumber = correctNumber
+
+        if (plannedWorkout.workoutNumber !== correctNumber) {
+          plannedWorkout.workoutNumber = correctNumber
           hasChanges = true
         }
       })
-  
-      if (block.usedCount !== blockWorkouts.length) {
+
+      const correctUsedCount = allBlockWorkouts.length
+
+      if (block.usedCount !== correctUsedCount) {
         setTrainingBlocks((prev) =>
           prev.map((item) =>
             item.id === block.id
-              ? { ...item, usedCount: blockWorkouts.length }
+              ? { ...item, usedCount: correctUsedCount }
               : item
           )
         )
       }
     })
-  
+
     if (hasChanges) {
       setPlannedWorkouts(updatedWorkouts)
     }
-  }, [plannedWorkouts, trainingBlocks, setPlannedWorkouts, setTrainingBlocks])
+  }, [
+    plannedWorkouts,
+    history,
+    trainingBlocks,
+    setPlannedWorkouts,
+    setTrainingBlocks,
+  ])
 
   function addTrainingBlock() {
     const activeBlock = trainingBlocks.find(
@@ -247,10 +270,20 @@ function CalendarPage({
       return
     }
 
+    const blockColors = [
+      "#E9DDFB",
+      "#DCEBFA",
+      "#DDF3E8",
+      "#FCE8D5",
+      "#F9DFE8",
+      "#E5E1FA",
+    ]
+    
     const newBlock = {
       id: Date.now(),
       size: blockSize,
       usedCount: 0,
+      color: blockColors[trainingBlocks.length % blockColors.length],
       createdAt: new Date().toISOString(),
     }
 
@@ -301,6 +334,7 @@ function CalendarPage({
       workoutNumber: workoutNumber,
       blockSize: activeBlock.size,
       exercises: selectedExercises,
+      blockColor: activeBlock.color,
     }
 
     setPlannedWorkouts((prev) => [newPlan, ...prev])
@@ -335,75 +369,122 @@ function CalendarPage({
     setShowPlanForm(false)
   }
 
-  
-function deletePlannedWorkout(workoutId) {
-  const workout = plannedWorkouts.find((item) => item.id === workoutId)
+  function completePlannedWorkout(workoutId) {
+    const workout = plannedWorkouts.find((item) => item.id === workoutId)
 
-  if (!workout) return
+    if (!workout) return
 
-  const confirmed = window.confirm(
-    "Ты действительно хочешь удалить эту тренировку?"
-  )
+    const completedAt = new Date().toISOString()
 
-  if (!confirmed) return
+    const completedWorkout = {
+      ...workout,
+      completedAt,
+      exercises: (workout.exercises || []).map((exercise) => ({
+        ...exercise,
+        sets: Array.isArray(exercise.sets) ? exercise.sets : [],
+      })),
+    }
 
-  let remainingWorkouts = plannedWorkouts.filter(
-    (item) => item.id !== workoutId
-  )
+    setHistory((prev) => [completedWorkout, ...prev])
 
-  if (workout.blockId) {
-    const blockWorkouts = remainingWorkouts
-    .filter((item) => item.blockId === workout.blockId)
-    .sort((a, b) => {
-      const dateComparison = a.date.localeCompare(b.date)
-  
-      if (dateComparison !== 0) return dateComparison
-  
-      return (a.time || "").localeCompare(b.time || "")
-    })
+    setPlannedWorkouts((prev) => prev.filter((item) => item.id !== workoutId))
 
-    const renumberedWorkouts = blockWorkouts.map((item, index) => ({
-      ...item,
-      workoutNumber: index + 1,
-    }))
+    setPlanHistory((prev) => [
+      {
+        id: Date.now(),
+        action: "Тренировка завершена",
+        workoutName: workout.name,
+        date: workout.date,
+        time: workout.time,
+        workoutNumber: workout.workoutNumber,
+        blockSize: workout.blockSize,
+        createdAt: completedAt,
+      },
+      ...prev,
+    ])
 
-    remainingWorkouts = remainingWorkouts.map((item) => {
-      if (item.blockId !== workout.blockId) return item
+    setShowDayPopup(false)
+    setNotification("Тренировка завершена!")
 
-      return renumberedWorkouts.find(
-        (updated) => updated.id === item.id
-      ) || item
-    })
-
-    setTrainingBlocks((prev) =>
-      prev.map((block) =>
-        block.id === workout.blockId
-          ? { ...block, usedCount: blockWorkouts.length }
-          : block
-      )
-    )
+    setTimeout(() => setNotification(""), 3000)
   }
 
-  setPlannedWorkouts(remainingWorkouts)
+  function deletePlannedWorkout(workoutId) {
+    const workout = plannedWorkouts.find((item) => item.id === workoutId)
 
-  setPlanHistory((prev) => [
-    {
-      id: Date.now(),
-      action: "Тренировка удалена",
-      workoutName: workout.name,
-      date: workout.date,
-      time: workout.time,
-      workoutNumber: workout.workoutNumber,
-      blockSize: workout.blockSize,
-      createdAt: new Date().toISOString(),
-    },
-    ...prev,
-  ])
+    if (!workout) return
 
-  setNotification("Тренировка удалена!")
-  setTimeout(() => setNotification(""), 3000)
-}
+    const confirmed = window.confirm(
+      "Ты действительно хочешь удалить эту тренировку?"
+    )
 
+    if (!confirmed) return
+
+    let remainingWorkouts = plannedWorkouts.filter(
+      (item) => item.id !== workoutId
+    )
+
+    if (workout.blockId) {
+      const completedWorkouts = history.filter(
+        (item) => item.blockId === workout.blockId
+      )
+
+      const plannedBlockWorkouts = remainingWorkouts.filter(
+        (item) => item.blockId === workout.blockId
+      )
+
+      const allBlockWorkouts = [
+        ...completedWorkouts,
+        ...plannedBlockWorkouts,
+      ].sort((a, b) => {
+        const dateComparison = a.date.localeCompare(b.date)
+
+        if (dateComparison !== 0) return dateComparison
+
+        return (a.time || "").localeCompare(b.time || "")
+      })
+
+      const renumberedWorkouts = allBlockWorkouts.map((item, index) => ({
+        ...item,
+        workoutNumber: index + 1,
+      }))
+
+      remainingWorkouts = remainingWorkouts.map((item) => {
+        if (item.blockId !== workout.blockId) return item
+
+        return (
+          renumberedWorkouts.find((updated) => updated.id === item.id) || item
+        )
+      })
+
+      setTrainingBlocks((prev) =>
+        prev.map((block) =>
+          block.id === workout.blockId
+            ? { ...block, usedCount: allBlockWorkouts.length }
+            : block
+        )
+      )
+    }
+
+    setPlannedWorkouts(remainingWorkouts)
+
+    setPlanHistory((prev) => [
+      {
+        id: Date.now(),
+        action: "Тренировка удалена",
+        workoutName: workout.name,
+        date: workout.date,
+        time: workout.time,
+        workoutNumber: workout.workoutNumber,
+        blockSize: workout.blockSize,
+        createdAt: new Date().toISOString(),
+      },
+      ...prev,
+    ])
+
+    setNotification("Тренировка удалена!")
+    setTimeout(() => setNotification(""), 3000)
+  }
 
   function saveWorkoutChanges(workoutId) {
     const workout = plannedWorkouts.find((item) => item.id === workoutId)
@@ -559,9 +640,23 @@ function deletePlannedWorkout(workoutId) {
               (workout) => workout.date === date
             )
 
+            const dayWorkouts = [
+              ...history.filter((workout) => workout.date === date),
+              ...dayPlannedWorkouts,
+            ]
+            
+            const dayBlockColor = dayWorkouts.find(
+              (workout) => workout.blockColor
+            )?.blockColor
+
             return (
               <button
                 key={date}
+                style={
+                  dayBlockColor
+                    ? { "--block-color": dayBlockColor }
+                    : {}
+                }
                 className={`calendar-day ${
                   selectedDate === date ? "selected" : ""
                 } ${hasWorkout ? "has-workout" : ""} ${
@@ -611,6 +706,21 @@ function deletePlannedWorkout(workoutId) {
             )
           })}
         </div>
+        <div className="selected-day">
+        <div className="selected-day-header">
+          <div>
+            <h3>
+              {new Date(selectedDate + "T00:00:00").toLocaleDateString(
+                "ru-RU",
+                {
+                  weekday: "long",
+                  day: "numeric",
+                  month: "long",
+                }
+              )}
+            </h3>
+            <p>Тренировки на выбранную дату</p>
+          </div>
       </div>
 
       {showDayPopup && (
@@ -719,30 +829,34 @@ function deletePlannedWorkout(workoutId) {
                         </div>
                       </div>
                     ) : (
-                      
-<div className="planned-popup-actions">
-  <button
-    className="add-button"
-    onClick={() => {
-      setEditingWorkoutId(workout.id)
-      setEditWorkoutDate(workout.date)
-      setEditWorkoutTime(workout.time || "18:00")
-      setEditWorkoutName(workout.name)
-    }}
-  >
-    Перенести / изменить
-  </button>
+                      <div className="planned-popup-actions">
+                        <button
+                          className="add-button"
+                          onClick={() => completePlannedWorkout(workout.id)}
+                        >
+                          ✓ Завершить тренировку
+                        </button>
+                        <button
+                          className="add-button"
+                          onClick={() => {
+                            setEditingWorkoutId(workout.id)
+                            setEditWorkoutDate(workout.date)
+                            setEditWorkoutTime(workout.time || "18:00")
+                            setEditWorkoutName(workout.name)
+                          }}
+                        >
+                          Перенести / изменить
+                        </button>
 
-  <button
-    className="planned-quick-delete"
-    onClick={() => deletePlannedWorkout(workout.id)}
-    title="Удалить тренировку"
-    aria-label="Удалить тренировку"
-  >
-    <span>🗑</span>
-  </button>
-</div>
-
+                        <button
+                          className="planned-quick-delete"
+                          onClick={() => deletePlannedWorkout(workout.id)}
+                          title="Удалить тренировку"
+                          aria-label="Удалить тренировку"
+                        >
+                          <span>🗑</span>
+                        </button>
+                      </div>
                     )}
                   </div>
                 ))}
@@ -793,174 +907,215 @@ function deletePlannedWorkout(workoutId) {
       )}
 
 
-<div className="selected-day">
-  <div className="selected-day-header">
-    <div>
-      <h3>
-        {new Date(selectedDate + "T00:00:00").toLocaleDateString("ru-RU", {
-          weekday: "long",
-          day: "numeric",
-          month: "long",
-        })}
-      </h3>
-      <p>Тренировки на выбранную дату</p>
-    </div>
 
-    {selectedWorkouts.length + selectedPlannedWorkouts.length > 0 && (
-      <span className="selected-day-badge">
-        {selectedWorkouts.length + selectedPlannedWorkouts.length}{" "}
-        {(() => {
-          const count = selectedWorkouts.length + selectedPlannedWorkouts.length
-          const lastTwo = count % 100
-          const last = count % 10
+          {selectedWorkouts.length + selectedPlannedWorkouts.length > 0 && (
+            <span className="selected-day-badge">
+              {selectedWorkouts.length + selectedPlannedWorkouts.length}{" "}
+              {(() => {
+                const count =
+                  selectedWorkouts.length + selectedPlannedWorkouts.length
+                const lastTwo = count % 100
+                const last = count % 10
 
-          if (lastTwo >= 11 && lastTwo <= 14) return "тренировок"
-          if (last === 1) return "тренировка"
-          if (last >= 2 && last <= 4) return "тренировки"
-          return "тренировок"
-        })()}
-      </span>
-    )}
-  </div>
-
-  {showBlockForm && (
-    <div className="card">
-      <h3>Новый блок тренировок</h3>
-
-      <label>Количество тренировок:</label>
-
-      <select
-        value={blockSize}
-        onChange={(e) => setBlockSize(Number(e.target.value))}
-      >
-        <option value={4}>4 тренировки</option>
-        <option value={8}>8 тренировок</option>
-        <option value={16}>16 тренировок</option>
-      </select>
-
-      <button className="add-button" onClick={addTrainingBlock}>
-        Создать блок
-      </button>
-    </div>
-  )}
-
-  {showPlanForm && (
-    <div className="modal-backdrop">
-      <div className="modal-card">
-        <h3>Новая тренировка</h3>
-
-        <p>Дата: {formatDate(selectedDate)}</p>
-
-        <label>Время тренировки</label>
-        <input
-          type="time"
-          value={planTime}
-          onChange={(e) => setPlanTime(e.target.value)}
-        />
-
-        <label>Тип тренировки</label>
-
-        <div className="workout-type-selector">
-          <button
-            type="button"
-            className={`workout-type-button ${
-              planName === "💪" ? "active" : ""
-            }`}
-            onClick={() => setPlanName("💪")}
-          >
-            <span>💪</span>
-            Руки
-          </button>
-
-          <button
-            type="button"
-            className={`workout-type-button ${
-              planName === "🦵" ? "active" : ""
-            }`}
-            onClick={() => setPlanName("🦵")}
-          >
-            <span>🦵</span>
-            Ноги
-          </button>
+                if (lastTwo >= 11 && lastTwo <= 14) return "тренировок"
+                if (last === 1) return "тренировка"
+                if (last >= 2 && last <= 4) return "тренировки"
+                return "тренировок"
+              })()}
+            </span>
+          )}
         </div>
 
-        <button
-          className="add-button"
-          onClick={addPlannedWorkout}
-          disabled={!planName.trim()}
-        >
-          Сохранить тренировку
-        </button>
+        {showBlockForm && (
+          <div className="card">
+            <h3>Новый блок тренировок</h3>
 
-        <button
-          className="delete-button"
-          onClick={() => setShowPlanForm(false)}
-        >
-          Отмена
-        </button>
-      </div>
-    </div>
-  )}
+            <label>Количество тренировок:</label>
 
-  {selectedPlannedWorkouts.map((workout) => (
-    <div className="planned-day-card" key={workout.id}>
-      <div className="planned-day-top">
-        <div className="planned-day-type">
-          <span className="planned-day-emoji">{workout.name}</span>
-          <div>
-            <strong>
-              {workout.name === "💪" ? "Тренировка рук" : "Тренировка ног"}
-            </strong>
-            <span>Блок тренировок</span>
+            <select
+              value={blockSize}
+              onChange={(e) => setBlockSize(Number(e.target.value))}
+            >
+              <option value={4}>4 тренировки</option>
+              <option value={8}>8 тренировок</option>
+              <option value={16}>16 тренировок</option>
+            </select>
+
+            <button className="add-button" onClick={addTrainingBlock}>
+              Создать блок
+            </button>
           </div>
-        </div>
+        )}
 
-        <span className="planned-day-status">Запланировано</span>
-      </div>
+        {showPlanForm && (
+          <div className="modal-backdrop">
+            <div className="modal-card">
+              <h3>Новая тренировка</h3>
 
-      <div className="planned-day-details">
-        <div>
-          <span>🕒</span>
-          <strong>{workout.time || "Время не указано"}</strong>
-        </div>
+              <p>Дата: {formatDate(selectedDate)}</p>
 
-        <div>
-          <span>🏋️</span>
-          <strong>
-            Тренировка {workout.workoutNumber} из {workout.blockSize}
-          </strong>
-        </div>
-      </div>
+              <label>Время тренировки</label>
+              <input
+                type="time"
+                value={planTime}
+                onChange={(e) => setPlanTime(e.target.value)}
+              />
 
-      <p className="planned-day-hint">
-        Чтобы изменить дату или время, дважды нажми на нужную дату в календаре
-      </p>
-    </div>
-  ))}
+              <label>Тип тренировки</label>
 
-  {selectedWorkouts.length === 0 &&
-    selectedPlannedWorkouts.length === 0 && (
-      <div className="empty-day-card">
-        <div className="empty-day-icon">🌿</div>
-        <strong>День для отдыха</strong>
-        <p>На этот день пока не запланировано тренировок</p>
+              <div className="workout-type-selector">
+                <button
+                  type="button"
+                  className={`workout-type-button ${
+                    planName === "💪" ? "active" : ""
+                  }`}
+                  onClick={() => setPlanName("💪")}
+                >
+                  <span>💪</span>
+                  Руки
+                </button>
 
-        <button
-          className="empty-day-button"
-          onClick={() => setShowDayPopup(true)}
+                <button
+                  type="button"
+                  className={`workout-type-button ${
+                    planName === "🦵" ? "active" : ""
+                  }`}
+                  onClick={() => setPlanName("🦵")}
+                >
+                  <span>🦵</span>
+                  Ноги
+                </button>
+              </div>
+
+              <button
+                className="add-button"
+                onClick={addPlannedWorkout}
+                disabled={!planName.trim()}
+              >
+                Сохранить тренировку
+              </button>
+
+              <button
+                className="delete-button"
+                onClick={() => setShowPlanForm(false)}
+              >
+                Отмена
+              </button>
+            </div>
+          </div>
+        )}
+
+        {selectedPlannedWorkouts.map((workout) => (
+          <div
+          className="planned-day-card"
+          key={workout.id}
+          style={{ "--block-color": workout.blockColor || "#e4defb" }}
         >
-          ＋ Запланировать тренировку
-        </button>
-      </div>
-    )}
+            <div className="planned-day-top">
+              <div className="planned-day-type">
+                <span className="planned-day-emoji">{workout.name}</span>
+                <div>
+                  <strong>
+                    {workout.name === "💪"
+                      ? "Тренировка рук"
+                      : "Тренировка ног"}
+                  </strong>
+                  <span>Блок тренировок</span>
+                </div>
+              </div>
 
+              <span className="planned-day-status">Запланировано</span>
+            </div>
 
+            <div className="planned-day-details">
+              <div>
+                <span>🕒</span>
+                <strong>{workout.time || "Время не указано"}</strong>
+              </div>
+
+              <div>
+                <span>🏋️</span>
+                <strong>
+                  Тренировка {workout.workoutNumber} из {workout.blockSize}
+                </strong>
+              </div>
+            </div>
+
+            <p className="planned-day-hint">
+              Чтобы изменить дату или время, дважды нажми на нужную дату в
+              календаре
+            </p>
+          </div>
+        ))}
+
+        {selectedWorkouts.length === 0 &&
+          selectedPlannedWorkouts.length === 0 && (
+            <div className="empty-day-card">
+              <div className="empty-day-icon">🌿</div>
+              <strong>День для отдыха</strong>
+              <p>На этот день пока не запланировано тренировок</p>
+
+              <button
+                className="empty-day-button"
+                onClick={() => setShowDayPopup(true)}
+              >
+                ＋ Запланировать тренировку
+              </button>
+            </div>
+          )}
 
         {selectedWorkouts.length > 0 && (
           <div className="cards">
             {selectedWorkouts.map((workout) => (
-              <div className="card" key={workout.id}>
-                <h3>{workout.name}</h3>
+              <div
+              className="card completed-workout-card"
+              key={workout.id}
+              style={{ "--block-color": workout.blockColor || "#e4defb" }}
+            >
+                <div className="planned-day-top">
+                  <div className="planned-day-type">
+                    <span className="planned-day-emoji">{workout.name}</span>
+                    <div>
+                      <strong>
+                        {workout.name === "💪"
+                          ? "Тренировка рук"
+                          : "Тренировка ног"}
+                      </strong>
+                      <span>
+                        {workout.blockNumber
+                          ? `Блок №${workout.blockNumber}`
+                          : "Тренировка"}
+                      </span>
+                    </div>
+                  </div>
+
+                  <span className="planned-day-status completed-status">
+                    ✓ Завершена
+                  </span>
+                </div>
+
+                <div className="planned-day-details">
+                  {workout.workoutNumber && (
+                    <div>
+                      <span>🏋️</span>
+                      <strong>
+                        Тренировка {workout.workoutNumber} из{" "}
+                        {workout.blockSize}
+                      </strong>
+                    </div>
+                  )}
+
+                  <div>
+                    <span>🕒</span>
+                    <strong>{workout.time || "Время не указано"}</strong>
+                  </div>
+                </div>
+
+                {(!workout.exercises || workout.exercises.length === 0) && (
+                  <p className="planned-day-hint">
+                    Упражнения и подходы пока не добавлены
+                  </p>
+                )}
 
                 {workout.exercises.map((exercise) => (
                   <div key={exercise.id}>
@@ -1046,18 +1201,18 @@ function deletePlannedWorkout(workoutId) {
       </div>
 
       <div className="history-section-header">
-  <div>
-    <h3>Лента изменений</h3>
-    <p>Назначения, переносы и удаления тренировок</p>
-  </div>
-</div>
+        <div>
+          <h3>Лента изменений</h3>
+          <p>Назначения, переносы и удаления тренировок</p>
+        </div>
+      </div>
 
       {planHistory.length === 0 ? (
         <div className="history-empty">
-  <span>📋</span>
-  <strong>История пока пуста</strong>
-  <p>Здесь появятся назначения, переносы и удаления тренировок</p>
-</div>
+          <span>📋</span>
+          <strong>История пока пуста</strong>
+          <p>Здесь появятся назначения, переносы и удаления тренировок</p>
+        </div>
       ) : (
         <div className="history-list">
           {planHistory.map((item, index) => {

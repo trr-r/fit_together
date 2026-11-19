@@ -1,9 +1,13 @@
 
 function Home({
+  user,
   trainingBlocks = [],
   plannedWorkouts = [],
   history = [],
 }) {
+  const avatar = localStorage.getItem(`avatar_${user?.id}`) || "💜"
+
+  const isPhoto = avatar.startsWith("data:image/")
   const blocksWithProgress = trainingBlocks.map((block) => {
     const usedCount = plannedWorkouts.filter(
       (workout) => workout.blockId === block.id
@@ -29,9 +33,6 @@ function Home({
 
   const now = new Date()
 
-  console.log("БЛОКИ:", trainingBlocks)
-console.log("ЗАПЛАНИРОВАННЫЕ ТРЕНИРОВКИ:", plannedWorkouts)
-  
   const todayDate = new Date(
     now.getFullYear(),
     now.getMonth(),
@@ -150,14 +151,22 @@ console.log("ЗАПЛАНИРОВАННЫЕ ТРЕНИРОВКИ:", plannedWorko
 
   return (
     <>
-      <header className="header">
-        <h1>FitTogether</h1>
-        <p>Твой личный дневник тренировок</p>
-      </header>
+<main className="content home-page">
+  <section className="home-greeting">
+    <div className="home-greeting-text">
+      <span>ТВОЁ ПРОСТРАНСТВО 💜</span>
+      <h1>Привет, {user?.name || "спортсмен"}!</h1>
+      <p>Готова к новой тренировке?</p>
+    </div>
 
-      <main className="content">
-        <h2>Привет!</h2>
-        <p>Готова к новой тренировке?</p>
+    <div className="home-avatar">
+      {isPhoto ? (
+        <img src={avatar} alt="Мой профиль" />
+      ) : (
+        <span>{avatar}</span>
+      )}
+    </div>
+  </section>
 
         {/* Ближайшая тренировка */}
         <section className="next-workout-card">

@@ -13,6 +13,20 @@
   --shadow: 0 5px 20px rgba(35, 40, 75, 0.05);
 }
 
+[data-theme="dark"] {
+  --primary: #a88bea;
+  --primary-dark: #9273d5;
+  --primary-light: #39304f;
+  --background: #171522;
+  --surface: #242132;
+  --text: #f4f0fc;
+  --text-secondary: #aaa3bb;
+  --border: #393348;
+  --success: #55c99a;
+  --danger: #f08089;
+  --shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -1531,4 +1545,816 @@ label {
   color: #795b46;
   font-size: 14px;
   line-height: 1.5;
+}
+
+/* Цветовые обозначения блоков тренировок */
+
+.planned-day-card,
+.completed-workout-card {
+  border-left: 5px solid var(--block-color, #e4defb);
+  background: linear-gradient(
+    110deg,
+    var(--block-color, #f7f5ff) 0%,
+    #ffffff 45%
+  );
+}
+
+.planned-day-card .planned-day-emoji,
+.completed-workout-card .planned-day-emoji {
+  background: var(--block-color, #f1edff);
+}
+
+.planned-day-card .planned-day-details > div,
+.completed-workout-card .planned-day-details > div {
+  background: rgba(255, 255, 255, 0.75);
+}
+
+/* Цвет дней календаря по блокам */
+
+.calendar-day.has-workout:not(.selected) {
+  background: var(--block-color, var(--primary-light));
+  color: var(--text);
+  font-weight: 700;
+}
+
+.calendar-day.has-workout .calendar-dot {
+  background: var(--primary-dark);
+}
+
+.calendar-day.selected.has-workout {
+  background: var(--primary);
+  color: white;
+}
+
+.coming-soon-card {
+  text-align: center;
+  padding: 40px 24px;
+  margin-top: 24px;
+}
+
+.coming-soon-emoji {
+  font-size: 56px;
+  margin-bottom: 20px;
+}
+
+.coming-soon-card h2 {
+  color: var(--text);
+  margin-bottom: 12px;
+}
+
+.coming-soon-card p {
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* Поддержка тёмной темы */
+
+.app {
+  background: var(--background);
+  color: var(--text);
+  transition: background 0.2s, color 0.2s;
+}
+
+.card,
+.calendar,
+.set-card,
+.plan-history-item,
+.history-card,
+.history-empty,
+.empty-day-card,
+.planned-day-card,
+.next-workout-card,
+.stats-card,
+.modal-card {
+  background-color: var(--surface);
+  color: var(--text);
+}
+
+.navigation {
+  background: var(--surface);
+}
+
+input:not([type="checkbox"]),
+select,
+textarea {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.set-adjust,
+.day-popup-workout {
+  background: var(--background);
+}
+
+[data-theme="dark"] .nav-item {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .calendar-tooltip {
+  background: var(--surface);
+  color: var(--text);
+}
+
+[data-theme="dark"] .history-message.outgoing {
+  background: #39304f;
+  border-color: #51436c;
+}
+
+[data-theme="dark"] .history-message.incoming {
+  background: #452e3b;
+  border-color: #64404e;
+}
+
+[data-theme="dark"] .planned-day-card,
+[data-theme="dark"] .completed-workout-card {
+  background: linear-gradient(
+    110deg,
+    var(--block-color, #39304f),
+    var(--surface) 70%
+  );
+}
+
+[data-theme="dark"] .rhythm-card {
+  background: linear-gradient(135deg, #49372b, #30252a);
+  border-color: #66503f;
+}
+
+[data-theme="dark"] .active-block-card,
+[data-theme="dark"] .next-workout-card,
+[data-theme="dark"] .stats-card {
+  border-color: var(--border);
+}
+
+.theme-settings-card {
+  margin-top: 24px;
+  padding: 20px;
+}
+
+.theme-settings-card h3 {
+  color: var(--text);
+  margin-top: 0;
+}
+
+.theme-settings-card p {
+  color: var(--text-secondary);
+}
+
+.theme-toggle-button {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: 12px;
+  background: var(--primary);
+  color: white;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+
+/* ==========================
+   Регистрация FitTogether
+========================== */
+
+.register-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 30px 20px;
+  background:
+    radial-gradient(circle at 10% 10%, #eeeaff 0, transparent 35%),
+    radial-gradient(circle at 90% 90%, #f0edff 0, transparent 35%),
+    var(--background);
+}
+
+.register-card {
+  width: 100%;
+  max-width: 420px;
+  padding: 34px 28px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 26px;
+  box-shadow: 0 15px 45px rgba(55, 45, 110, 0.09);
+}
+
+.register-logo {
+  color: var(--primary);
+  font-size: 29px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.register-subtitle {
+  margin: 8px 0 30px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  text-align: center;
+}
+
+.register-card h2 {
+  margin: 0;
+  color: var(--text);
+  font-size: 23px;
+  text-align: center;
+}
+
+.register-description {
+  margin: 8px 0 27px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  text-align: center;
+}
+
+.register-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.register-card label {
+  margin-top: 8px;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.register-card input:not([type="checkbox"]) {
+  width: 100%;
+  min-height: 49px;
+  padding: 13px 15px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--background);
+  color: var(--text);
+  font-size: 14px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.register-card input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(102, 80, 200, 0.1);
+}
+
+.register-card h3 {
+  margin: 17px 0 4px;
+  color: var(--text);
+  font-size: 14px;
+}
+
+.register-roles {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.register-roles button {
+  min-height: 95px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 12px 5px;
+  border: 1px solid var(--border);
+  border-radius: 15px;
+  background: var(--background);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.register-roles button span {
+  font-size: 28px;
+}
+
+.register-roles button.selected-role {
+  border: 2px solid var(--primary);
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.register-submit {
+  width: 100%;
+  min-height: 51px;
+  margin-top: 9px;
+  border: none;
+  border-radius: 13px;
+  background: var(--primary);
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.register-submit:hover {
+  background: var(--primary-dark);
+}
+
+.register-submit:active {
+  transform: scale(0.98);
+}
+
+.register-submit:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.register-hint {
+  margin: 7px 0 0;
+  color: var(--text-secondary);
+  font-size: 11px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.register-success {
+  margin: 18px 0 0;
+  padding: 13px;
+  border-radius: 12px;
+  background: #e9f8f1;
+  color: #249b70;
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.register-error {
+  margin: 18px 0 0;
+  padding: 13px;
+  border-radius: 12px;
+  background: #fff0f1;
+  color: var(--danger);
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: center;
+}
+
+@media (max-width: 480px) {
+  .register-page {
+    padding: 20px 15px;
+  }
+
+  .register-card {
+    padding: 28px 21px;
+    border-radius: 22px;
+  }
+}
+
+[data-theme="dark"] .register-page {
+  background:
+    radial-gradient(circle at 10% 10%, #302944 0, transparent 35%),
+    var(--background);
+}
+
+
+/* ==========================
+   Профиль FitTogether
+========================== */
+
+.profile-page {
+  padding-bottom: 100px;
+}
+
+.profile-main-card {
+  text-align: center;
+  padding: 28px 20px;
+}
+
+.profile-avatar-wrapper {
+  position: relative;
+  width: 112px;
+  height: 112px;
+  margin: 0 auto 16px;
+}
+
+.profile-avatar {
+  width: 112px;
+  height: 112px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid var(--primary-light);
+}
+
+.profile-avatar-emoji {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 53px;
+}
+
+.profile-photo-button {
+  position: absolute;
+  right: 0;
+  bottom: 2px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid var(--surface);
+  border-radius: 50%;
+  background: var(--primary);
+  color: white;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.profile-main-card h2 {
+  margin: 8px 0;
+  color: var(--text);
+  font-size: 23px;
+}
+
+.profile-role {
+  margin: 5px 0;
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.profile-email {
+  margin: 8px 0 18px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+}
+
+.profile-upload-actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.profile-upload-button,
+.profile-reset-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 15px;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: var(--primary-light);
+  color: var(--primary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.profile-reset-button {
+  background: var(--background);
+  color: var(--text-secondary);
+}
+
+.profile-avatars-card h3 {
+  margin-top: 0;
+}
+
+.profile-avatars-card > p {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.profile-avatars-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 13px;
+  margin-top: 20px;
+}
+
+.profile-avatar-option {
+  width: 100%;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid transparent;
+  border-radius: 17px;
+  font-size: 30px;
+  cursor: pointer;
+  transition: transform 0.2s, border-color 0.2s;
+}
+
+.profile-avatar-option:active {
+  transform: scale(0.94);
+}
+
+.profile-avatar-option.active {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+.profile-account-card p {
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.profile-error {
+  margin: 12px 0 0;
+  color: var(--danger);
+  font-size: 13px;
+}
+
+.profile-account-card button {
+  width: 100%;
+  margin-top: 10px;
+}
+
+@media (max-width: 480px) {
+  .profile-avatars-grid {
+    gap: 10px;
+  }
+
+  .profile-avatar-option {
+    border-radius: 14px;
+  }
+}
+
+.profile-avatars-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.profile-avatars-toggle span:last-child {
+  color: var(--primary);
+  font-size: 13px;
+}
+
+.profile-avatars-card > p {
+  margin-bottom: 15px;
+}
+
+
+/* ==========================
+   Главная FitTogether
+========================== */
+
+.home-page {
+  padding-top: 20px;
+}
+
+.home-greeting {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 25px;
+  padding: 23px 20px;
+  border-radius: 22px;
+  background: linear-gradient(135deg, #eeeaff, #f8f5ff);
+}
+
+.home-greeting-text {
+  min-width: 0;
+}
+
+.home-greeting-text > span {
+  color: #7866bd;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.home-greeting-text h1 {
+  margin: 9px 0 6px;
+  color: #302750;
+  font-size: 24px;
+  overflow-wrap: anywhere;
+}
+
+.home-greeting-text p {
+  margin: 0;
+  color: #77718b;
+  font-size: 13px;
+}
+
+.home-avatar {
+  flex-shrink: 0;
+  width: 68px;
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 3px solid white;
+  border-radius: 50%;
+  background: #e3dafa;
+  font-size: 34px;
+  box-shadow: 0 4px 14px rgba(65, 45, 120, 0.12);
+}
+
+.home-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+[data-theme="dark"] .home-greeting {
+  background: linear-gradient(135deg, #302944, #29263a);
+}
+
+[data-theme="dark"] .home-greeting-text h1 {
+  color: #f3efff;
+}
+
+[data-theme="dark"] .home-greeting-text p {
+  color: #c0b9d1;
+}
+
+@media (max-width: 380px) {
+  .home-greeting {
+    padding: 18px 15px;
+  }
+
+  .home-greeting-text h1 {
+    font-size: 20px;
+  }
+
+  .home-avatar {
+    width: 58px;
+    height: 58px;
+  }
+}
+
+
+/* ==========================
+   Исправления тёмной темы
+========================== */
+
+[data-theme="dark"] .next-workout-card {
+  background: linear-gradient(135deg, #29263b, #242132);
+  border-color: #49415f;
+}
+
+[data-theme="dark"] .next-workout-header h3,
+[data-theme="dark"] .next-workout-date {
+  color: #f4f0fc;
+}
+
+[data-theme="dark"] .next-workout-type,
+[data-theme="dark"] .next-workout-empty p {
+  color: #d0c8df;
+}
+
+[data-theme="dark"] .next-workout-date span,
+[data-theme="dark"] .next-workout-empty span {
+  color: #aaa3bb;
+}
+
+/* Тренировочный блок */
+
+[data-theme="dark"] .active-block-card {
+  background: linear-gradient(135deg, #302944, #242132);
+  border-color: #51436c;
+}
+
+[data-theme="dark"] .active-block-header h3,
+[data-theme="dark"] .active-block-empty h3 {
+  color: #f4f0fc;
+}
+
+[data-theme="dark"] .active-block-stats span,
+[data-theme="dark"] .active-block-progress-info {
+  color: #c0b9d1;
+}
+
+[data-theme="dark"] .active-block-empty p {
+  color: #c0b9d1;
+}
+
+[data-theme="dark"] .active-block-progress {
+  background: #49415d;
+}
+
+/* Регулярность */
+
+[data-theme="dark"] .rhythm-header h3,
+[data-theme="dark"] .rhythm-last-workout strong {
+  color: #fff0df;
+}
+
+[data-theme="dark"] .rhythm-streak span,
+[data-theme="dark"] .rhythm-last-workout,
+[data-theme="dark"] .rhythm-message {
+  color: #e0c8b5;
+}
+
+[data-theme="dark"] .rhythm-last-workout {
+  border-color: #66503f;
+}
+
+/* Статистика */
+
+[data-theme="dark"] .stats-card {
+  background: linear-gradient(135deg, #29263b, #242132);
+  border-color: #49415f;
+}
+
+[data-theme="dark"] .stats-header h3 {
+  color: #f4f0fc;
+}
+
+[data-theme="dark"] .stat-item span {
+  color: #c0b9d1;
+}
+
+/* Календарь — выбранная дата */
+
+[data-theme="dark"] .selected-day-header h3,
+[data-theme="dark"] .history-section-header h3,
+[data-theme="dark"] .selected-day > h3 {
+  color: #f4f0fc;
+}
+
+[data-theme="dark"] .selected-day-header p,
+[data-theme="dark"] .history-section-header p {
+  color: #aaa3bb;
+}
+
+/* Пустой день и история */
+
+[data-theme="dark"] .empty-day-card,
+[data-theme="dark"] .history-empty {
+  background: linear-gradient(145deg, #29263b, #242132);
+  border-color: #49415f;
+}
+
+[data-theme="dark"] .empty-day-card strong,
+[data-theme="dark"] .history-empty strong {
+  color: #f4f0fc;
+}
+
+[data-theme="dark"] .empty-day-card p,
+[data-theme="dark"] .history-empty p {
+  color: #c0b9d1;
+}
+
+/* Выходные в календаре */
+
+[data-theme="dark"] .calendar-day.weekend:not(.selected),
+[data-theme="dark"] .calendar-day.transferred-day:not(.selected) {
+  background: #452e3b;
+  color: #f3a0aa;
+}
+
+[data-theme="dark"] .calendar-day.holiday:not(.selected) {
+  background: #493d29;
+  color: #f1c878;
+}
+
+
+/* Кнопка выхода из аккаунта */
+
+.profile-account-card {
+  margin-bottom: 20px;
+}
+
+.profile-account-card button {
+  width: 100%;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  margin-top: 18px;
+  padding: 13px 18px;
+  border: 1px solid #f1d5d9;
+  border-radius: 13px;
+  background: #fff3f4;
+  color: #cf5968;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.profile-account-card button:hover {
+  background: #ffe6e9;
+}
+
+.profile-account-card button:active {
+  transform: scale(0.98);
+}
+
+[data-theme="dark"] .profile-account-card button {
+  background: #452e3b;
+  border-color: #64404e;
+  color: #ffa0aa;
+}
+
+[data-theme="dark"] .profile-account-card button:hover {
+  background: #553544;
 }

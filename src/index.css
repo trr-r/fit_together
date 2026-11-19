@@ -1,9 +1,8 @@
-
 * {
   box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  background-color: #eeeaf5;
+  font-family: Arial, sans-serif;
 }

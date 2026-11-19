@@ -4,6 +4,7 @@
   "homepage": "https://trr-r.github.io/fit_together",
   "private": true,
   "dependencies": {
+    "@supabase/supabase-js": "^2.119.1",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.3",
